@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/resume-api
+      - FRONTEND_URL=http://localhost:5173
+      # Pass through other sensitive env vars from host .env
+      - SPRING_MAIL_HOST
+      - SPRING_MAIL_PORT
+      - SPRING_MAIL_USERNAME
+      - SPRING_MAIL_PASSWORD
+      - SPRING_MAIL_FROM
+      - CLOUDINARY_CLOUD_NAME
+      - CLOUDINARY_API_KEY
+      - CLOUDINARY_API_SECRET
+      - RAZORPAY_KEY_ID
+      - RAZORPAY_KEY_SECRET
+      - APP_BASE_URL=http://localhost:8080
+    depends_on:
+      - mongo
+    networks:
+      - resume-network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:80"
+    networks:
+      - resume-network
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - resume-network
+
+networks:
+  resume-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
